@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    networks:
+      - service_network
+    container_name: prometheus
+    restart: always
+    user: root
+    volumes:
+      - ./config/:/etc/prometheus/
+      - ./data/:/prometheus
+
+networks:
+  service_network:
+    external: true

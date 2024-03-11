@@ -1,0 +1,60 @@
+version: "3"
+
+services:
+  clash-exporter:
+    image: zzde/clash-exporter:latest
+    restart: always
+    networks:
+      - service_network
+    environment:
+      - CLASH_HOST=10.0.0.1:9090
+      - CLASH_TOKEN=
+    entrypoint:
+      # clash meta 暂不支持 tracing  所以只能collectTracing=false
+      ["/app/clash-exporter", "-collectTracing=false", "-collectDest=true"]
+  adguardhome-exporter:
+    image: ebrianne/adguard-exporter:latest
+    restart: always
+    networks:
+      - service_network
+    env_file:
+      - ../.env
+    environment:
+      - adguard_protocol=ADGUARDHOME_PROTOCOL
+      - adguard_hostname=ADGUARDHOME_HOSTNAME
+      - adguard_port=ADGUARDHOME_PORT
+      - adguard_username=ADGUARDHOME_USERNAME
+      - adguard_password=ADGUARDHOME_PASSWORD
+      - interval=10s
+      - log_limit=10000
+  pve-exporter:
+    image: prompve/prometheus-pve-exporter
+    env_file:
+      - ../.env
+    environment:
+      - PVE_USER=PROXMOX_USER
+      - PVE_PASSWORD=PROXMOX_PASSWORD
+      - PVE_VERIFY_SSL=PROXMOX_VERIFY_SSL
+    restart: always
+    networks:
+      - service_network
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: monitoring_node_exporter
+    restart: always
+    networks:
+      - service_network
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    container_name: monitoring_cadvisor
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - service_network
+networks:
+  service_network:
+    external: true

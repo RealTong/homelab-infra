@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    user: "472:472"
+    networks:
+      - service_network
+    volumes:
+      - ./data:/data
+      - ./custom.ini:/etc/grafana/grafana.ini
+      - ${CERT_CA}:/etc/ssl/certs/wildcard.wst.sh.pem
+    env_file:
+      - ../.env
+    environment:
+      - PORT=3000
+      - GF_PATHS_DATA=/data
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+
+networks:
+  service_network:
+    external: true

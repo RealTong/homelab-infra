@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    networks:
+      - service_network
+    environment:
+      - NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/wst-ca.crt
+    env_file:
+      - ../.env
+    volumes:
+      - ./data:/app/data
+      - ${CERT_CA}:/usr/local/share/ca-certificates/wst-ca.crt:ro
+
+networks:
+  service_network:
+    external: true

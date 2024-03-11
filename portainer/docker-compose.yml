@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: always
+    networks:
+      - service_network
+    env_file:
+      - ../.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/data
+      - ${CERT_CA}:/usr/local/share/ca-certificates/wst-sh-ca.crt:ro
+    environment:
+      SSL_CERT_FILE: /usr/local/share/ca-certificates/wst-sh-ca.crt
+networks:
+  service_network:
+    external: true
